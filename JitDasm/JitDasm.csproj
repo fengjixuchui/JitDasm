@@ -2,18 +2,47 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp2.1;net472</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp2.1</TargetFrameworks>
+    <!-- It's not possible to target .NET Framework 4.7.2 when using dotnet pack
+         together with packaging as a tool -->
+    <NoTargetFrameworkNet472 Condition=" '$(PACKING)' == 'true' ">true</NoTargetFrameworkNet472>
+    <TargetFrameworks Condition=" '$(NoTargetFrameworkNet472)' != 'true' ">$(TargetFrameworks);net472</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
     <nullable>enable</nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Features>strict</Features>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>jitdasm</ToolCommandName>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <Description>Disassembles one or more .NET methods / types to stdout or file(s). It can also create diffable disassembly.</Description>
+    <Title>$(Description)</Title>
+    <Authors>0xd4d</Authors>
+    <!-- name is too similar to an unlisted package jit-dasm from 2016. Yeah, that's going to confuse everyone, NuGet! -->
+    <PackageId>JitDasm.0xd4d</PackageId>
+    <PackageProjectUrl>https://github.com/0xd4d/JitDasm</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/0xd4d/JitDasm</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>jit;disassembly;disassembler;.net;dotnet;coreclr;clr</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <NoWarn>NU5105</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="dnlib" Version="3.3.0" />
+    <PackageReference Include="dnlib" Version="3.3.1" />
     <PackageReference Include="Iced" Version="1.4.0" />
-    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="1.1.57004" />
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="1.1.61812" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+  </PropertyGroup>
 
 </Project>

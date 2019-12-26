@@ -2,6 +2,14 @@
 
 Disassembles one or more .NET methods / types to stdout or file(s). It can also create diffable disassembly.
 
+# .NET global tool
+
+It's available as a [.NET global tool](https://www.nuget.org/packages/JitDasm.0xd4d/)
+
+```cmd
+dotnet tool install -g JitDasm.0xd4d
+```
+
 # Tips
 
 - .NET Core: Disable tiered compilation in target process: `COMPlus_TieredCompilation=0`
@@ -19,6 +27,7 @@ jitdasm -p 1234 --diffable -m ConsoleApp1 --method TestMethod
 ; ================================================================================
 ; ConsoleApp1.Program.TestMethod(System.String[])
 ; 87 (0x57) bytes
+; 27 (0x1B) instructions
 
         push    rdi
         push    rsi
@@ -97,6 +106,7 @@ Disassembles jitted methods in .NET processes
     nasm            => NASM syntax
     gas             => GNU assembler (AT&T) syntax
     att             => same as gas
+    intel           => Intel (XED) syntax
 -o, --output <path>             Output filename or directory
 --type <tok-or-name>            Disassemble this type (wildcards supported) or type token
 --type-exclude <tok-or-name>    Don't disassemble this type (wildcards supported) or type token

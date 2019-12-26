@@ -44,8 +44,12 @@ namespace JitDasm {
 				}
 
 				var jitDasmOptions = CommandLineParser.Parse(args);
-				if (!string2.IsNullOrEmpty(jitDasmOptions.LoadModule))
+				if (!string2.IsNullOrEmpty(jitDasmOptions.LoadModule)) {
+#if DEBUG
+					Console.Error.WriteLine($"Trying to jit methods in module '{jitDasmOptions.LoadModule}' but JitDasm is a debug build, not a release build!");
+#endif
 					MethodJitter.JitMethods(jitDasmOptions.LoadModule, jitDasmOptions.TypeFilter, jitDasmOptions.MethodFilter, jitDasmOptions.RunClassConstructors, jitDasmOptions.AssemblySearchPaths);
+				}
 				var (bitness, methods, knownSymbols) = GetMethodsToDisassemble(jitDasmOptions.Pid, jitDasmOptions.ModuleName, jitDasmOptions.TypeFilter, jitDasmOptions.MethodFilter, jitDasmOptions.HeapSearch);
 				var jobs = GetJobs(methods, jitDasmOptions.OutputDir, jitDasmOptions.FileOutputKind, jitDasmOptions.FilenameFormat, out var baseDir);
 				if (!string2.IsNullOrEmpty(baseDir))
@@ -270,6 +274,9 @@ namespace JitDasm {
 				var clrInfo = dataTarget.ClrVersions[0];
 				var clrRuntime = clrInfo.CreateRuntime(clrInfo.LocalMatchingDac);
 				bitness = clrRuntime.PointerSize * 8;
+
+				// Per https://github.com/microsoft/clrmd/issues/303
+				dataTarget.DataReader.Flush();
 
 				var module = clrRuntime.Modules.FirstOrDefault(a =>
 					StringComparer.OrdinalIgnoreCase.Equals(a.Name, moduleName) ||
